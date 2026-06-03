@@ -4,7 +4,7 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  throw new Error("Not able to fetch cars")
+  // throw new Error("Not able to fetch cars")
   const cars = await Car.find().sort("name");
   res.send(cars);
 });
@@ -50,7 +50,7 @@ router.put("/:id", async (req, res) => {
       numberInStock: req.body.numberInStock,
       dailyRentalRate: req.body.dailyRentalRate,
     },
-    { new: true }
+    { new: true },
   );
 
   if (!car)

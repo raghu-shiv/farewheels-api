@@ -5,6 +5,7 @@ FareWheels is a robust Node.js backend application built using the Express.js fr
 ---
 
 ## Table of Contents
+
 1. [Tech Stack](#tech-stack)
 2. [Project Structure](#project-structure)
 3. [Features & Design Patterns](#features--design-patterns)
@@ -23,13 +24,14 @@ FareWheels is a robust Node.js backend application built using the Express.js fr
 ---
 
 ## Tech Stack
-* **Runtime**: Node.js
-* **Framework**: Express.js
-* **Database**: MongoDB (Object Data Modeling via Mongoose)
-* **Validation**: Joi, Joi-ObjectId
-* **Security & Optimization**: Helmet, Gzip compression (`compression`), bcrypt (password hashing), JSON Web Tokens (`jsonwebtoken`)
-* **Logging & Error Handling**: Winston (with Winston MongoDB transport), `express-async-errors`
-* **Configuration**: `config` (node-config)
+
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Database**: MongoDB (Object Data Modeling via Mongoose)
+- **Validation**: Joi, Joi-ObjectId
+- **Security & Optimization**: Helmet, Gzip compression (`compression`), bcrypt (password hashing), JSON Web Tokens (`jsonwebtoken`)
+- **Logging & Error Handling**: Winston (with Winston MongoDB transport), `express-async-errors`
+- **Configuration**: `config` (node-config)
 
 ---
 
@@ -78,22 +80,27 @@ FareWheels/
 ## Features & Design Patterns
 
 ### 1. Robust Winston Logging
+
 Centralized logging captures all errors, unhandled exceptions, and unhandled promise rejections:
-* **Errors**: Written to `error.log` in JSON format (with timestamps) and logged to a MongoDB collection specified in `MONGO_URI`.
-* **Exceptions**: Uncaught exceptions are caught and logged to `exceptions.log` and the Console.
-* **Rejections**: Unhandled promise rejections are handled and logged to `rejections.log`.
+
+- **Errors**: Written to `error.log` in JSON format (with timestamps) and logged to a MongoDB collection specified in `MONGO_URI`.
+- **Exceptions**: Uncaught exceptions are caught and logged to `exceptions.log` and the Console.
+- **Rejections**: Unhandled promise rejections are handled and logged to `rejections.log`.
 
 ### 2. ACID Transactions for Rentals
+
 When a rental is created, two database actions must succeed atomically:
+
 1. Saving the new `Rental` document.
 2. Decrementing the `numberInStock` on the selected `Car` document.
 
 FareWheels uses **Mongoose/MongoDB Sessions and Transactions** (`startSession()`, `startTransaction()`, `commitTransaction()`, `abortTransaction()`) to guarantee consistency and rollback on failure.
 
 ### 3. JWT-based Authentication & RBAC
-* **User Registration**: Password hashed with a salt factor of 10 using `bcrypt`.
-* **JWT Generation**: Encapsulated in the User model (`user.generateAuthToken()`). It embeds user ID and their `isAdmin` flag.
-* **Role-Based Access Control (RBAC)**: Custom middlewares enforce access:
+
+- **User Registration**: Password hashed with a salt factor of 10 using `bcrypt`.
+- **JWT Generation**: Encapsulated in the User model (`user.generateAuthToken()`). It embeds user ID and their `isAdmin` flag.
+- **Role-Based Access Control (RBAC)**: Custom middlewares enforce access:
   - `auth`: Rejects request if JWT token is missing (`x-auth-token`) or invalid.
   - `admin`: Verifies `req.user.isAdmin === true` to allow modifications (e.g. deleting a company).
 
@@ -102,10 +109,12 @@ FareWheels uses **Mongoose/MongoDB Sessions and Transactions** (`startSession()`
 ## Getting Started
 
 ### Prerequisites
-* [Node.js](https://nodejs.org/) (v16+ recommended)
-* [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) or a running local MongoDB instance.
+
+- [Node.js](https://nodejs.org/) (v16+ recommended)
+- [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) or a running local MongoDB instance.
 
 ### Environment Variables
+
 Configure the following in your `.env` file at the root directory:
 
 ```env
@@ -118,6 +127,7 @@ MONGO_URI="mongodb+srv://..."
 ### Installation & Setup
 
 1. **Install Dependencies**:
+
    ```bash
    npm install
    ```
@@ -136,8 +146,9 @@ All request bodies must be JSON, and API payloads require appropriate headers wh
 ### Authentication & Users
 
 #### 1. Register User
-* **Method & Path**: `POST /api/users`
-* **Request Body**:
+
+- **Method & Path**: `POST /api/users`
+- **Request Body**:
   ```json
   {
     "name": "Jane Doe",
@@ -145,8 +156,8 @@ All request bodies must be JSON, and API payloads require appropriate headers wh
     "password": "securepassword123"
   }
   ```
-* **Response Headers**: Returns JWT token in `x-auth-token` header.
-* **Response Body**:
+- **Response Headers**: Returns JWT token in `x-auth-token` header.
+- **Response Body**:
   ```json
   {
     "id": "user_mongodb_id",
@@ -156,20 +167,22 @@ All request bodies must be JSON, and API payloads require appropriate headers wh
   ```
 
 #### 2. User Authentication (Login)
-* **Method & Path**: `POST /api/auth`
-* **Request Body**:
+
+- **Method & Path**: `POST /api/auth`
+- **Request Body**:
   ```json
   {
     "email": "jane@example.com",
     "password": "securepassword123"
   }
   ```
-* **Response Body**: Raw JWT string (e.g., `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`)
+- **Response Body**: Raw JWT string (e.g., `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`)
 
 #### 3. Fetch Current Profile
-* **Method & Path**: `GET /api/users/me`
-* **Headers**: `x-auth-token: <your_jwt_token>`
-* **Response Body**:
+
+- **Method & Path**: `GET /api/users/me`
+- **Headers**: `x-auth-token: <your_jwt_token>`
+- **Response Body**:
   ```json
   {
     "_id": "user_mongodb_id",
@@ -184,15 +197,18 @@ All request bodies must be JSON, and API payloads require appropriate headers wh
 ### Companies
 
 #### 1. List Companies
-* **Method & Path**: `GET /api/companies`
+
+- **Method & Path**: `GET /api/companies`
 
 #### 2. Get Company by ID
-* **Method & Path**: `GET /api/companies/:id`
+
+- **Method & Path**: `GET /api/companies/:id`
 
 #### 3. Create Company
-* **Method & Path**: `POST /api/companies`
-* **Headers**: `x-auth-token: <your_jwt_token>`
-* **Request Body**:
+
+- **Method & Path**: `POST /api/companies`
+- **Headers**: `x-auth-token: <your_jwt_token>`
+- **Request Body**:
   ```json
   {
     "name": "Toyota Motors"
@@ -200,26 +216,31 @@ All request bodies must be JSON, and API payloads require appropriate headers wh
   ```
 
 #### 4. Update Company
-* **Method & Path**: `PUT /api/companies/:id`
-* **Request Body**: Same as POST.
+
+- **Method & Path**: `PUT /api/companies/:id`
+- **Request Body**: Same as POST.
 
 #### 5. Delete Company (Admin-only)
-* **Method & Path**: `DELETE /api/companies/:id`
-* **Headers**: `x-auth-token: <admin_jwt_token>`
+
+- **Method & Path**: `DELETE /api/companies/:id`
+- **Headers**: `x-auth-token: <admin_jwt_token>`
 
 ---
 
 ### Customers
 
 #### 1. List Customers
-* **Method & Path**: `GET /api/customers`
+
+- **Method & Path**: `GET /api/customers`
 
 #### 2. Get Customer by ID
-* **Method & Path**: `GET /api/customers/:id`
+
+- **Method & Path**: `GET /api/customers/:id`
 
 #### 3. Create Customer
-* **Method & Path**: `POST /api/customers`
-* **Request Body**:
+
+- **Method & Path**: `POST /api/customers`
+- **Request Body**:
   ```json
   {
     "name": "John Smith",
@@ -229,25 +250,30 @@ All request bodies must be JSON, and API payloads require appropriate headers wh
   ```
 
 #### 4. Update Customer
-* **Method & Path**: `PUT /api/customers/:id`
-* **Request Body**: Same as POST.
+
+- **Method & Path**: `PUT /api/customers/:id`
+- **Request Body**: Same as POST.
 
 #### 5. Delete Customer
-* **Method & Path**: `DELETE /api/customers/:id`
+
+- **Method & Path**: `DELETE /api/customers/:id`
 
 ---
 
 ### Cars
 
 #### 1. List Cars (Note: See [Known Issues](#known-issues--code-quality-notes))
-* **Method & Path**: `GET /api/cars`
+
+- **Method & Path**: `GET /api/cars`
 
 #### 2. Get Car by ID
-* **Method & Path**: `GET /api/cars/:id`
+
+- **Method & Path**: `GET /api/cars/:id`
 
 #### 3. Create Car
-* **Method & Path**: `POST /api/cars`
-* **Request Body**:
+
+- **Method & Path**: `POST /api/cars`
+- **Request Body**:
   ```json
   {
     "modelName": "Corolla Altis",
@@ -258,25 +284,30 @@ All request bodies must be JSON, and API payloads require appropriate headers wh
   ```
 
 #### 4. Update Car
-* **Method & Path**: `PUT /api/cars/:id`
-* **Request Body**: Same as POST.
+
+- **Method & Path**: `PUT /api/cars/:id`
+- **Request Body**: Same as POST.
 
 #### 5. Delete Car
-* **Method & Path**: `DELETE /api/cars/:id`
+
+- **Method & Path**: `DELETE /api/cars/:id`
 
 ---
 
 ### Rentals
 
 #### 1. List Rentals
-* **Method & Path**: `GET /api/rentals`
+
+- **Method & Path**: `GET /api/rentals`
 
 #### 2. Get Rental by ID
-* **Method & Path**: `GET /api/rentals/:id`
+
+- **Method & Path**: `GET /api/rentals/:id`
 
 #### 3. Create Rental (Atomic Transaction)
-* **Method & Path**: `POST /api/rentals`
-* **Request Body**:
+
+- **Method & Path**: `POST /api/rentals`
+- **Request Body**:
   ```json
   {
     "customerId": "customer_mongodb_id",
@@ -285,20 +316,3 @@ All request bodies must be JSON, and API payloads require appropriate headers wh
   ```
 
 ---
-
-## Known Issues & Code Quality Notes
-
-1. **`GET /api/cars` Route is Broken**:
-   The list cars route (`routes/cars.js` line 7) currently explicitly throws an error prior to reading from the database:
-   ```javascript
-   router.get("/", async (req, res) => {
-     throw new Error("Not able to fetch cars")
-     const cars = await Car.find().sort("name");
-     res.send(cars);
-   });
-   ```
-   *Action Needed*: Remove `throw new Error("Not able to fetch cars")` to enable normal functionality.
-
-2. **ReferenceError in Global Error Middleware**:
-   The error handling middleware `middleware/error.js` calls `logger.error(...)` but does not import or define `logger` at the top of the file. This results in a `ReferenceError: logger is not defined` crash when an unhandled route error occurs.
-   *Action Needed*: Add `const { logger } = require("../initialize/logging");` to `middleware/error.js`.
