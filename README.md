@@ -4,6 +4,21 @@ FareWheels is a robust Node.js backend application built using the Express.js fr
 
 ---
 
+## Live API
+
+The FareWheels API is deployed and publicly accessible via Render.
+
+- **Production URL**: [https://www.farewheels.run.place](https://www.farewheels.run.place)
+- **API Base URL**: [https://www.farewheels.run.place/api](https://www.farewheels.run.place/api)
+
+**Example:**
+
+```http
+GET https://www.farewheels.run.place/api/cars
+```
+
+---
+
 ## Table of Contents
 
 1. [Tech Stack](#tech-stack)
@@ -13,13 +28,19 @@ FareWheels is a robust Node.js backend application built using the Express.js fr
    - [Prerequisites](#prerequisites)
    - [Environment Variables](#environment-variables)
    - [Installation & Setup](#installation--setup)
-5. [API Documentation](#api-documentation)
+5. [Deployment](#deployment)
+6. [API Documentation](#api-documentation)
    - [Authentication & Users](#authentication--users)
    - [Companies](#companies)
    - [Customers](#customers)
    - [Cars](#cars)
    - [Rentals](#rentals)
-6. [Known Issues & Code Quality Notes](#known-issues--code-quality-notes)
+7. [Logging & Monitoring](#logging--monitoring)
+8. [Security Features](#security-features)
+9. [Architecture Highlights](#architecture-highlights)
+10. [Testing](#testing)
+11. [Project Status](#project-status)
+12. [License](#license)
 
 ---
 
@@ -139,9 +160,57 @@ MONGO_URI="mongodb+srv://..."
 
 ---
 
+## Deployment
+
+FareWheels is deployed on Render and configured for production workloads.
+
+- **Environment**: Production
+- **Hosting**: Render
+- **Database**: MongoDB Atlas
+- **Security**: HTTPS Enabled
+- **Configuration**: Environment-Based
+- **Logging**: Centralized Error Logging
+- **CI/CD**: Automatic Deployments
+
+### Verify Deployment
+
+Health check using any browser or API client:
+
+```http
+GET https://www.farewheels.run.place/api/cars
+```
+
+---
+
 ## API Documentation
 
 All request bodies must be JSON, and API payloads require appropriate headers where authenticated.
+
+### Authentication Flow
+
+#### Step 1: Register
+
+```http
+POST /api/users
+```
+
+**Response Headers**: Receive JWT token in `x-auth-token`.
+
+#### Step 2: Login
+
+```http
+POST /api/auth
+```
+
+**Response**: JWT Token String.
+
+#### Step 3: Access Protected Routes
+
+Include JWT token in headers:
+
+```http
+x-auth-token: <jwt_token>
+```
 
 ### Authentication & Users
 
@@ -196,51 +265,24 @@ All request bodies must be JSON, and API payloads require appropriate headers wh
 
 ### Companies
 
-#### 1. List Companies
-
-- **Method & Path**: `GET /api/companies`
-
-#### 2. Get Company by ID
-
-- **Method & Path**: `GET /api/companies/:id`
-
-#### 3. Create Company
-
-- **Method & Path**: `POST /api/companies`
-- **Headers**: `x-auth-token: <your_jwt_token>`
-- **Request Body**:
+- **List Companies**: `GET /api/companies`
+- **Get Company by ID**: `GET /api/companies/:id`
+- **Create Company**: `POST /api/companies` (Requires auth)
   ```json
   {
     "name": "Toyota Motors"
   }
   ```
-
-#### 4. Update Company
-
-- **Method & Path**: `PUT /api/companies/:id`
-- **Request Body**: Same as POST.
-
-#### 5. Delete Company (Admin-only)
-
-- **Method & Path**: `DELETE /api/companies/:id`
-- **Headers**: `x-auth-token: <admin_jwt_token>`
+- **Update Company**: `PUT /api/companies/:id` (Requires auth)
+- **Delete Company (Admin-only)**: `DELETE /api/companies/:id` (Requires admin auth)
 
 ---
 
 ### Customers
 
-#### 1. List Customers
-
-- **Method & Path**: `GET /api/customers`
-
-#### 2. Get Customer by ID
-
-- **Method & Path**: `GET /api/customers/:id`
-
-#### 3. Create Customer
-
-- **Method & Path**: `POST /api/customers`
-- **Request Body**:
+- **List Customers**: `GET /api/customers`
+- **Get Customer by ID**: `GET /api/customers/:id`
+- **Create Customer**: `POST /api/customers`
   ```json
   {
     "name": "John Smith",
@@ -248,32 +290,16 @@ All request bodies must be JSON, and API payloads require appropriate headers wh
     "isPrime": true
   }
   ```
-
-#### 4. Update Customer
-
-- **Method & Path**: `PUT /api/customers/:id`
-- **Request Body**: Same as POST.
-
-#### 5. Delete Customer
-
-- **Method & Path**: `DELETE /api/customers/:id`
+- **Update Customer**: `PUT /api/customers/:id`
+- **Delete Customer**: `DELETE /api/customers/:id`
 
 ---
 
 ### Cars
 
-#### 1. List Cars (Note: See [Known Issues](#known-issues--code-quality-notes))
-
-- **Method & Path**: `GET /api/cars`
-
-#### 2. Get Car by ID
-
-- **Method & Path**: `GET /api/cars/:id`
-
-#### 3. Create Car
-
-- **Method & Path**: `POST /api/cars`
-- **Request Body**:
+- **List Cars**: `GET /api/cars`
+- **Get Car by ID**: `GET /api/cars/:id`
+- **Create Car**: `POST /api/cars`
   ```json
   {
     "modelName": "Corolla Altis",
@@ -282,32 +308,16 @@ All request bodies must be JSON, and API payloads require appropriate headers wh
     "dailyRentalRate": 45.5
   }
   ```
-
-#### 4. Update Car
-
-- **Method & Path**: `PUT /api/cars/:id`
-- **Request Body**: Same as POST.
-
-#### 5. Delete Car
-
-- **Method & Path**: `DELETE /api/cars/:id`
+- **Update Car**: `PUT /api/cars/:id`
+- **Delete Car**: `DELETE /api/cars/:id`
 
 ---
 
 ### Rentals
 
-#### 1. List Rentals
-
-- **Method & Path**: `GET /api/rentals`
-
-#### 2. Get Rental by ID
-
-- **Method & Path**: `GET /api/rentals/:id`
-
-#### 3. Create Rental (Atomic Transaction)
-
-- **Method & Path**: `POST /api/rentals`
-- **Request Body**:
+- **List Rentals**: `GET /api/rentals`
+- **Get Rental by ID**: `GET /api/rentals/:id`
+- **Create Rental (Atomic Transaction)**: `POST /api/rentals`
   ```json
   {
     "customerId": "customer_mongodb_id",
@@ -316,3 +326,115 @@ All request bodies must be JSON, and API payloads require appropriate headers wh
   ```
 
 ---
+
+## Logging & Monitoring
+
+FareWheels uses Winston for centralized logging and monitoring.
+
+**Logged Events:**
+
+- Application Errors
+- Unhandled Exceptions
+- Promise Rejections
+- Runtime Failures
+
+**Log Destinations:**
+
+- `error.log`
+- `exceptions.log`
+- `rejections.log`
+- MongoDB Logs Collection
+
+This provides visibility into production issues and simplifies troubleshooting.
+
+---
+
+## Security Features
+
+**Authentication:**
+
+- JWT-based authentication
+- Password hashing using bcrypt
+- Protected route middleware
+
+**Authorization:**
+
+- Role-Based Access Control (RBAC)
+- Admin-only route protection
+
+**Validation:**
+
+- Joi schema validation
+- MongoDB ObjectId validation
+
+**Security Headers:**
+
+- Helmet middleware
+- Gzip compression
+
+---
+
+## Architecture Highlights
+
+**Modular Structure:**
+The application follows a modular architecture with clear separation of concerns:
+
+- Routes
+- Middleware
+- Models
+- Configuration
+- Initialization
+
+**Transaction-Safe Rentals:**
+Rental creation uses MongoDB transactions to ensure:
+
+- Rental creation succeeds
+- Vehicle inventory updates succeed
+- Automatic rollback on failure
+
+**Environment-Based Configuration:**
+Node-config enables seamless switching between:
+
+- Development
+- Production
+- Custom deployment environments
+
+---
+
+## Testing (Postman)
+
+**Base URL**: `https://www.farewheels.run.place/api`
+
+**Recommended API Testing Flow:**
+
+1. Register User
+2. Authenticate User
+3. Copy JWT Token
+4. Create Company
+5. Create Customer
+6. Create Car
+7. Create Rental
+8. Verify Inventory Reduction
+
+---
+
+## Project Status
+
+**Feature Status:**
+
+- [x] User Authentication
+- [x] RBAC Authorization
+- [x] Company Management
+- [x] Customer Management
+- [x] Car Management
+- [x] Rental Transactions
+- [x] MongoDB Transactions
+- [x] Winston Logging
+- [x] Render Deployment
+- [x] MongoDB Atlas
+
+---
+
+## License
+
+This project is intended for educational, portfolio, and demonstration purposes.
